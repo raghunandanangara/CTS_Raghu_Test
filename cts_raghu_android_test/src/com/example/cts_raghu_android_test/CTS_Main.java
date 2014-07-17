@@ -36,6 +36,9 @@ public class CTS_Main extends Activity {
 	private RequestQueue mRequestQueue;
 	ImageLoader.ImageCache imageCache;
 	ImageLoader imageLoader;
+	
+	
+	private static final String JSON_URL = "https://dl.dropboxusercontent.com/s/g41ldl6t0afw9dv/facts.json";
 
 
 	@Override
@@ -69,17 +72,17 @@ public class CTS_Main extends Activity {
 			@Override
 			public void onClick(View v) {
 				arrNews.clear();
-				new AsycTaskJsonParser(va, arrNews, getResources(), mContext).execute();
+				new AsycTaskJsonParser(va, arrNews, mContext).execute(JSON_URL);
 				lstView.invalidate();
 			}
 		});
 
 
 
-		AsycTaskJsonParser task_readJSONfromFileParse = new AsycTaskJsonParser(va, arrNews, getResources(), mContext);
+		AsycTaskJsonParser task_readJSONfromFileParse = new AsycTaskJsonParser(va, arrNews, mContext);
 		String returned_string = null;
 		try {
-			returned_string = task_readJSONfromFileParse.execute().get();
+			returned_string = task_readJSONfromFileParse.execute(JSON_URL).get();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (ExecutionException e) {

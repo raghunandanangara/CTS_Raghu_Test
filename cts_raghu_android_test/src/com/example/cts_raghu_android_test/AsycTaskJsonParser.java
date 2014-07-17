@@ -1,7 +1,5 @@
 package com.example.cts_raghu_android_test;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,13 +8,11 @@ import org.json.JSONObject;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class AsycTaskJsonParser extends AsyncTask<Void, Void, String>{
+public class AsycTaskJsonParser extends AsyncTask<String, Void, String>{
 	private Context mainActivityContext;
-	private Resources resourses;
 	private String mResponse;
 	private DataAdapter adapter;
 	private List<DataModelRow> atm_list;
@@ -34,28 +30,14 @@ public class AsycTaskJsonParser extends AsyncTask<Void, Void, String>{
 	List<DataModelRow> tempitems; //Using a templist as we should not use items directly to avoid following error
 	/*The content of the adapter has changed but ListView did not receive a notification” exception */
 
-	public AsycTaskJsonParser(DataAdapter adapter, List<DataModelRow> atm_list, Resources resourses,
+	public AsycTaskJsonParser(DataAdapter adapter, List<DataModelRow> atm_list,
 			Context mainActivityContext) {
 		super();
 		this.mainActivityContext = mainActivityContext;
 		this.adapter = adapter;
-		this.resourses = resourses;
 		this.atm_list = atm_list;
 		tempitems = new ArrayList<DataModelRow>();
 		pd = new ProgressDialog(this.mainActivityContext);
-	}
-
-	public void readJsonFromFile(){
-		try {
-			InputStream is = resourses.openRawResource(R.raw.exercise);
-			int size = is.available();
-			byte[] buffer = new byte[size];
-			is.read(buffer);
-			is.close();
-			setmResponse(new String(buffer));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public String getmResponse() {
@@ -99,7 +81,11 @@ public class AsycTaskJsonParser extends AsyncTask<Void, Void, String>{
 	}
 
 	@Override
-	protected String doInBackground(Void... params) {
+	protected String doInBackground(String... params) {
+		String url = params[0];
+		JSONParser jParser = new JSONParser();
+		//JSONArray jsonObject = jParser.getJSONFromUrl(url);
+		setmResponse(jParser.getJSONFromUrl(url));
 		parseJSON(getmResponse());
 		Log.i("Raghu", "Doing in Backgroud");
 		return getTxtTitle();
@@ -118,7 +104,6 @@ public class AsycTaskJsonParser extends AsyncTask<Void, Void, String>{
 	@Override
 	protected void onPreExecute() {
 		super.onPreExecute();
-		readJsonFromFile();
 		pd.setTitle("Processing...");
 		pd.setMessage("Please wait.");
 		pd.setCancelable(false);
