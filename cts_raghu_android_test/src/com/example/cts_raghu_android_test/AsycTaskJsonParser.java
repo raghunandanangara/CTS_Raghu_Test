@@ -11,7 +11,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class AsycTaskJsonParser extends AsyncTask<String, Void, String>{
+public class AsycTaskJsonParser extends AsyncTask<String, Void, Void>{
 	private Context mainActivityContext;
 	private String mResponse;
 	private DataAdapter adapter;
@@ -19,16 +19,10 @@ public class AsycTaskJsonParser extends AsyncTask<String, Void, String>{
 	private ProgressDialog pd;
 	private String txtTitle;
 
-	public String getTxtTitle() {
-		return txtTitle;
-	}
-
-	public void setTxtTitle(String txtTitle) {
-		this.txtTitle = txtTitle;
-	}
-
 	List<DataModelRow> tempitems; //Using a templist as we should not use items directly to avoid following error
 	/*The content of the adapter has changed but ListView did not receive a notification” exception */
+
+	Update_ActivityTitle_Interface mUpdateTitleInterface_listener;
 
 	public AsycTaskJsonParser(DataAdapter adapter, List<DataModelRow> atm_list,
 			Context mainActivityContext) {
@@ -38,6 +32,21 @@ public class AsycTaskJsonParser extends AsyncTask<String, Void, String>{
 		this.atm_list = atm_list;
 		tempitems = new ArrayList<DataModelRow>();
 		pd = new ProgressDialog(this.mainActivityContext);
+		mUpdateTitleInterface_listener = (Update_ActivityTitle_Interface) mainActivityContext;
+	}
+
+	public interface Update_ActivityTitle_Interface {
+
+		public void update_Activitytitle_Method(String result);
+
+	}
+
+	public String getTxtTitle() {
+		return txtTitle;
+	}
+
+	public void setTxtTitle(String txtTitle) {
+		this.txtTitle = txtTitle;
 	}
 
 	public String getmResponse() {
@@ -81,24 +90,29 @@ public class AsycTaskJsonParser extends AsyncTask<String, Void, String>{
 	}
 
 	@Override
-	protected String doInBackground(String... params) {
+	protected Void doInBackground(String... params) {
 		String url = params[0];
 		JSONParser jParser = new JSONParser();
 		//JSONArray jsonObject = jParser.getJSONFromUrl(url);
 		setmResponse(jParser.getJSONFromUrl(url));
 		parseJSON(getmResponse());
 		Log.i("Raghu", "Doing in Backgroud");
-		return getTxtTitle();
+		return null;
 	}
 
 	@Override
-	protected void onPostExecute(String result) {
+	protected void onPostExecute(Void result) {
 		super.onPostExecute(result);
 		if (pd!=null) {
 			pd.dismiss();
 		}
 		atm_list.addAll(tempitems); //Copying all the contents back on UI thread and notifying adapter of changes immediately
 		adapter.notifyDataSetChanged();
+
+		if (mUpdateTitleInterface_listener != null) 
+		{
+			mUpdateTitleInterface_listener.update_Activitytitle_Method(getTxtTitle());
+		}
 	}
 
 	@Override

@@ -1,8 +1,6 @@
 package com.example.cts_raghu_android_test;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
@@ -16,7 +14,7 @@ import android.widget.ListView;
 import android.app.Activity;
 import android.content.Context;
 
-public class CTS_Main extends Activity {
+public class CTS_Main extends Activity implements AsycTaskJsonParser.Update_ActivityTitle_Interface{
 
 	/** Elements in activity_main.xml*/
 	private ListView lstView;
@@ -36,8 +34,8 @@ public class CTS_Main extends Activity {
 	private RequestQueue mRequestQueue;
 	ImageLoader.ImageCache imageCache;
 	ImageLoader imageLoader;
-	
-	
+
+	/** www.dropbox.com is replaced by dl.dropboxusercontent.com to download JSON content*/
 	private static final String JSON_URL = "https://dl.dropboxusercontent.com/s/g41ldl6t0afw9dv/facts.json";
 
 
@@ -45,7 +43,7 @@ public class CTS_Main extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_cts_main);
-		
+
 
 		lf = LayoutInflater.from(this);
 
@@ -59,7 +57,7 @@ public class CTS_Main extends Activity {
 		/** Initializing Arraylist and Adapter*/
 		arrNews = new ArrayList<DataModelRow>();
 		va = new DataAdapter(lf, arrNews, imageLoader);
-		
+
 		lstView = (ListView) findViewById(R.id.listView);
 
 
@@ -77,20 +75,15 @@ public class CTS_Main extends Activity {
 			}
 		});
 
-
-
-		AsycTaskJsonParser task_readJSONfromFileParse = new AsycTaskJsonParser(va, arrNews, mContext);
-		String returned_string = null;
-		try {
-			returned_string = task_readJSONfromFileParse.execute(JSON_URL).get();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
+		new AsycTaskJsonParser(va, arrNews, mContext).execute(JSON_URL);
 		lstView.setAdapter(va);
-		
-		setTitle(returned_string);
+	}
+
+
+	@Override
+	public void update_Activitytitle_Method(String result) {
+		// TODO Auto-generated method stub
+		setTitle(result);
 	}
 
 }
