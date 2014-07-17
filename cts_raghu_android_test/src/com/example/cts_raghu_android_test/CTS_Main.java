@@ -69,13 +69,8 @@ public class CTS_Main extends Activity {
 			@Override
 			public void onClick(View v) {
 				arrNews.clear();
-				va.clearAdapter();
-				//va.notifyDataSetChanged();
-				
-				//lstView.setAdapter(null);
-				new AsycTaskJsonParser(va, arrNews, getResources(), mContext);
-				lstView.setAdapter(va);
-				//lstView.refreshDrawableState();
+				new AsycTaskJsonParser(va, arrNews, getResources(), mContext).execute();
+				lstView.invalidate();
 			}
 		});
 
